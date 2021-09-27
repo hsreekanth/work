@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+    nodejs-app:
+        build:
+          context: ./nodedocker_app
+        container_name: nodejsserver
+        hostname: nodejsserver
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mongo
+            - mysql
+    mysql:
+        image: mysql:8.0
+        restart: on-failure
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./data/mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: "root"
+    mongo:
+        container_name: mongo
+        image: mongo
+        volumes:
+            - ./data:/data/db
+        ports:
+            - "27017:27017"
+    nginx:
+        build:
+          context: ./nginx
+        container_name: nginx
+        hostname: nginx
+        ports:
+            - "88:88"
+        depends_on:
+            - nodejs-app
